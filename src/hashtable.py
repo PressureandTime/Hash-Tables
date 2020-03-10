@@ -17,6 +17,7 @@ class HashTable:
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
         self.count = 0
+        self.is_resized: False
 
     def _hash(self, key):
         '''
@@ -25,8 +26,8 @@ class HashTable:
         You may replace the Python hash with DJB2 as a stretch goal.
         '''
         hashed_key = 5381
-        for letter in key:
-            hashed_key = hashed_key * 33 + ord(letter)
+        for char in key:
+            hashed_key = hashed_key * 33 + ord(char)
         return hashed_key
 
     def _hash_djb2(self, key):
@@ -36,8 +37,8 @@ class HashTable:
         OPTIONAL STRETCH: Research and implement DJB2
         '''
         hashed_key = 5381
-        for letter in key:
-            hashed_key = hashed_key * 33 + ord(letter)
+        for char in key:
+            hashed_key = hashed_key * 33 + ord(char)
         return hashed_key
 
     def _hash_mod(self, key):
@@ -73,6 +74,9 @@ class HashTable:
 
         self.count += 1
 
+        if self.count / len(self.storage) > 0.7:
+            self.resize()
+
     def remove(self, key):
         '''
         Remove the value stored with the given key.
@@ -88,7 +92,7 @@ class HashTable:
             print("Error: there is no such value")
         elif self.storage[hashed_index].value == value:
             self.storage[hashed_index] = self.storage[hashed_index].next
-            self.count -=1
+            self.count -= 1
         else:
             parent = self.storage[hashed_index]
             current_node = self.storage[hashed_index].next
@@ -96,13 +100,11 @@ class HashTable:
             while current_node:
                 if current_node.value == value:
                     parent.next = current_node.next
-                    self.count -=1
+                    self.count -= 1
                     return
                 current_node = current_node.next
 
             print("Error: there is no such value")
-
-    
 
     def retrieve(self, key):
         '''
@@ -130,7 +132,26 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        self.capacity *= 2
+
+        temporary_storage = [None] * len(self.storage)
+
+        for i in range(len(self.storage)):
+            temporary_storage[i] = self.storage[i]
+
+        self.storage = [None] * self.capacity
+        self.count = 0
+        self.is_resized = True
+
+        for i in range(len(temporary_storage)):
+            if temporary_storage[i]:
+                self.insert(temporary_storage[i].key,
+                            temporary_storage[i].value)
+                p = temporary_storage[i].next
+                while p:
+                    self.insert(temporary_storage[i].key,
+                                temporary_storage[i].value)
+                    p = p.next
 
 
 if __name__ == "__main__":
