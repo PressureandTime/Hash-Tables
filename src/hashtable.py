@@ -74,8 +74,8 @@ class HashTable:
 
         self.count += 1
 
-        if self.count / len(self.storage) > 0.7:
-            self.resize()
+        # if self.count / len(self.storage) > 0.7:
+        #     self.resize()
 
     def remove(self, key):
         '''
@@ -132,26 +132,39 @@ class HashTable:
 
         Fill this in.
         '''
-        self.capacity *= 2
+        #new_capacity = len(self.storage) * 2
 
-        temporary_storage = [None] * len(self.storage)
-
+        # temporary_storage = [None] * len(self.storage)
+        temporary_storage = HashTable(len(self.storage) * 2)
+        current_pair = None
         for i in range(len(self.storage)):
-            temporary_storage[i] = self.storage[i]
+            #temporary_storage[i] = self.storage[i]
+            current_pair = self.storage[i]
+            while current_pair is not None:
+                temporary_storage.insert(current_pair.key, current_pair.value)
+                current_pair = current_pair.next
+        print(len(self.storage), '22')
+        self.capacity = temporary_storage.capacity
+        self.storage = temporary_storage.storage
+        print(len(self.storage), '3333')
+        return temporary_storage
 
-        self.storage = [None] * self.capacity
-        self.count = 0
-        self.is_resized = True
 
-        for i in range(len(temporary_storage)):
-            if temporary_storage[i]:
-                self.insert(temporary_storage[i].key,
-                            temporary_storage[i].value)
-                p = temporary_storage[i].next
-                while p:
-                    self.insert(temporary_storage[i].key,
-                                temporary_storage[i].value)
-                    p = p.next
+
+       # self.storage = [None] * self.capacity
+       # self.count = 0
+     #   self.is_resized = True
+
+       # for i in range(len(temporary_storage)):
+           # if temporary_storage[i]:
+           #     self.insert(temporary_storage[i].key,
+           #                 temporary_storage[i].value)
+           #     p = temporary_storage[i].next
+           #     while p:
+              #      self.insert(temporary_storage[i].key,
+              #                  temporary_storage[i].value)
+            #        p = p.next
+      #  return temporary_storage
 
 
 if __name__ == "__main__":
